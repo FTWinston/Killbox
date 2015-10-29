@@ -46,7 +46,7 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 
 		byte[][] chunk = new byte[16][];
 		
-		setBiome(world, cx, cz);
+		setBiome(biomes, cx, cz);
 		
 		boolean isBorderChunk = createWalls(cx, cz, chunk);
 		
@@ -179,7 +179,7 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 		return border;
 	}
 
-	private void setBiome(World world, int cx, int cz)
+	private void setBiome(BiomeGrid grid, int cx, int cz)
 	{
 		// set up biomes - world divides into 4 quarters
 		Biome biome;
@@ -200,7 +200,7 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 		
 		for (int x=0; x<16; x++)
 			for (int z=0; z<16; x++)
-				world.setBiome(cx * 16 + x, cz * 16 + z, biome);
+				grid.setBiome(x, z, biome);
 	}
 	
 	private void setMaterialAt(byte[][] chunk, int x, int y, int z, byte material)
