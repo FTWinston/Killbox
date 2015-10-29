@@ -9,6 +9,11 @@ import org.bukkit.generator.BlockPopulator;
 
 public class FloorPopulator extends BlockPopulator
 {
+	public FloorPopulator(int stoneY, int grassY)
+	{
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public void populate(World w, Random r, Chunk c)
 	{

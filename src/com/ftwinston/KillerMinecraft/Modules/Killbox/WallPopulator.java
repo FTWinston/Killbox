@@ -10,6 +10,11 @@ import org.bukkit.generator.BlockPopulator;
 
 public class WallPopulator extends BlockPopulator
 {
+	public WallPopulator(int minX, int maxX, int minZ, int maxZ)
+	{
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public void populate(World w, Random r, Chunk c)
 	{

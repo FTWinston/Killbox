@@ -26,12 +26,15 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 	@SuppressWarnings("deprecation")
 	final byte invisible = (byte)Material.BARRIER.getId();
 
-	int minBorderCX = -1, minBorderCZ = -1, maxBorderCX, maxBorderCZ, maxY;
-	int middleChunkX1, middleChunkX2, middleChunkZ1, middleChunkZ2;
+	int minBorderCX = -1, minBorderCZ = -1, maxBorderCX, maxBorderCY, maxBorderCZ, maxY;
+	int middleChunkX1, middleChunkX2, middleChunkZ1, middleChunkZ2, middleX, middleZ;
 	
+	int maxX, maxZ;
 	public BoxGenerator(int sizeX, int sizeY, int sizeZ)
 	{
+		maxX = sizeX; maxZ = sizeZ;
 		maxBorderCX = sizeX >> 4;
+		maxBorderCY = (sizeY >> 4) + 1;
 		maxBorderCZ = sizeZ >> 4;
 		maxY = sizeY;
 		
@@ -40,14 +43,25 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 		
 		middleChunkZ1 = (maxBorderCZ - 1) / 2;
 		middleChunkZ2 = (maxBorderCZ) / 2;
+		
+		middleX = middleChunkX2 * 16;
+		middleZ = middleChunkZ2 * 16;
+	}
+	
+	@Override
+	public boolean canSpawn(World world, int x, int z)
+	{
+		return x > middleX - 6 && x < middleX + 6 && z > middleZ + 6 && z < middleZ + 6;
 	}
 	
 	public byte[][] generateBlockSections(World world, Random random, int cx, int cz, BiomeGrid biomes)
 	{
-		if (cx < minBorderCX || cz < minBorderCZ || cx > maxBorderCX || cx > maxBorderCZ)
+		if (cx < minBorderCX || cz < minBorderCZ || cx > maxBorderCX || cz > maxBorderCZ)
 			return new byte[1][];
 
-		byte[][] chunk = new byte[16][];
+		byte[][] chunk = new byte[maxBorderCY + 1][];
+		for (int layer = 0; layer <= maxBorderCY; layer++)
+			chunk[layer] = new byte[4096];
 		
 		setBiome(biomes, cx, cz);
 		
@@ -123,9 +137,9 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 			int x = 0; // stone at x=0
 			for (int z=0; z<16; z++)
 			{
-				for (int y=16; y<16; y++)
+				for (int y=1; y<17; y++)
 					setMaterialAt(chunk, x, y, z, dirt);
-				for (int y=16; y<=maxY; y++)
+				for (int y=17; y<=maxY; y++)
 					setMaterialAt(chunk, x, y, z, stone);
 			}
 		}
@@ -134,9 +148,9 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 			int x = 15; // stone at x=15
 			for (int z=0; z<16; z++)
 			{
-				for (int y=16; y<16; y++)
+				for (int y=1; y<17; y++)
 					setMaterialAt(chunk, x, y, z, dirt);
-				for (int y=16; y<=maxY; y++)
+				for (int y=17; y<=maxY; y++)
 					setMaterialAt(chunk, x, y, z, stone);
 			}
 		}
@@ -157,25 +171,25 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 				for (int y=0; y<=maxY; y++)
 					setMaterialAt(chunk, x, y, z, bedrock);
 		}
-		else if (cz == minBorderCZ + 1)
+		else if (!border && cz == minBorderCZ + 1)
 		{
 			int z = 0; // stone at z=0
 			for (int x=0; x<16; x++)
 			{
-				for (int y=16; y<16; y++)
+				for (int y=1; y<17; y++)
 					setMaterialAt(chunk, x, y, z, dirt);
-				for (int y=16; y<=maxY; y++)
+				for (int y=17; y<=maxY; y++)
 					setMaterialAt(chunk, x, y, z, stone);
 			}
 		}
-		else if (cz == maxBorderCZ - 1)
+		else if (!border && cz == maxBorderCZ - 1)
 		{
 			int z = 15; // stone at z=15
 			for (int x=0; x<16; x++)
 			{
-				for (int y=16; y<16; y++)
+				for (int y=1; y<17; y++)
 					setMaterialAt(chunk, x, y, z, dirt);
-				for (int y=16; y<=maxY; y++)
+				for (int y=17; y<=maxY; y++)
 					setMaterialAt(chunk, x, y, z, stone);
 			}
 		}
@@ -202,7 +216,7 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 		}
 		
 		for (int x=0; x<16; x++)
-			for (int z=0; z<16; x++)
+			for (int z=0; z<16; z++)
 				grid.setBiome(x, z, biome);
 	}
 	
@@ -210,8 +224,8 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 	{
 		int sec_id = (y >> 4);
 		int yy = y & 0xF;
-		if (chunk[sec_id] == null)
-			chunk[sec_id] = new byte[4096];
+		//if (chunk[sec_id] == null)
+			//chunk[sec_id] = new byte[4096];
 
 		chunk[sec_id][(yy << 8) | (z << 4) | x] = material;
 	}
@@ -220,9 +234,9 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 	public List<BlockPopulator> getDefaultPopulators(World world)
 	{
 		List<BlockPopulator> list = new ArrayList<BlockPopulator>();
-		list.add(new WallPopulator());
-		list.add(new FloorPopulator());
-		list.add(new CeilingPopulator());
+		list.add(new WallPopulator(0, maxX, 0, maxZ));
+		list.add(new FloorPopulator(1, 2));
+		list.add(new CeilingPopulator(maxY));
 		return list;
 	}
 }
