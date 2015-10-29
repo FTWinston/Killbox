@@ -1,10 +1,13 @@
 package com.ftwinston.KillerMinecraft.Modules.Killbox;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
+import org.bukkit.generator.BlockPopulator;
 
 public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 {
@@ -211,5 +214,15 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 			chunk[sec_id] = new byte[4096];
 
 		chunk[sec_id][(yy << 8) | (z << 4) | x] = material;
+	}
+
+	@Override
+	public List<BlockPopulator> getDefaultPopulators(World world)
+	{
+		List<BlockPopulator> list = new ArrayList<BlockPopulator>();
+		list.add(new WallPopulator());
+		list.add(new FloorPopulator());
+		list.add(new CeilingPopulator());
+		return list;
 	}
 }

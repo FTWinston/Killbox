@@ -50,7 +50,6 @@ public class Killbox extends WorldGenerator
 	{
 		BoxSize size = boxSize.getValue();
 		world.setGenerator(new BoxGenerator(size.width, size.height, size.width));
-		//world.setExtraPopulators(extraPopulators); TODO: add block populators
 		createWorld(world, runWhenDone);
 	}
 }
