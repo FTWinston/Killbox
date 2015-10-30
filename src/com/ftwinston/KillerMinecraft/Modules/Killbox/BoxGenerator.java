@@ -27,6 +27,8 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 	final byte invisible = (byte)Material.BARRIER.getId();
 	@SuppressWarnings("deprecation")
 	final byte lava = (byte)Material.STATIONARY_LAVA.getId();
+	@SuppressWarnings("deprecation")
+	final byte water = (byte)Material.STATIONARY_WATER.getId();
 
 	int minBorderCX = -1, minBorderCZ = -1, maxBorderCX, maxBorderCY, maxBorderCZ, minY = 48, maxY;
 	int middleChunkX1, middleChunkX2, middleChunkZ1, middleChunkZ2, middleX, middleZ;
@@ -124,6 +126,44 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 				setMaterialAt(chunk, x, minY, z, stone);
 				setMaterialAt(chunk, x, minY + 1, z, grass);
 			}
+		
+		// add buried water near the walls
+		if (cx == minBorderCX + 1)
+		{
+			int minZ = cz == minBorderCZ + 1 ? 4 : 0;
+			int maxZ = cz == maxBorderCZ - 1 ? 11 : 15;
+			for (int z=minZ; z<=maxZ; z++)
+				for (int x=1; x<=3; x++)
+					for (int y = minY - 2; y < minY; y++)
+						setMaterialAt(chunk, x, y, z, water);
+		}
+		else if (cx == maxBorderCX - 1)
+		{
+			int minZ = cz == minBorderCZ + 1 ? 4 : 0;
+			int maxZ = cz == maxBorderCZ - 1 ? 11 : 15;
+			for (int z=minZ; z<=maxZ; z++)
+				for (int x=12; x<=14; x++)
+					for (int y = minY - 2; y < minY; y++)
+						setMaterialAt(chunk, x, y, z, water);
+		}
+		if (cz == minBorderCZ + 1)
+		{
+			int minX = cx == minBorderCX + 1 ? 4 : 0;
+			int maxX = cx == maxBorderCX - 1 ? 11 : 15;
+			for (int x=minX; x<=maxX; x++)
+				for (int z=1; z<=3; z++)
+					for (int y = minY - 2; y < minY; y++)
+						setMaterialAt(chunk, x, y, z, water);
+		}
+		else if (cz == maxBorderCZ - 1)
+		{
+			int minX = cx == minBorderCX + 1 ? 4 : 0;
+			int maxX = cx == maxBorderCX - 1 ? 11 : 15;
+			for (int x=minX; x<=maxX; x++)
+				for (int z=12; z<=14; z++)
+					for (int y = minY - 2; y < minY; y++)
+						setMaterialAt(chunk, x, y, z, water);
+		}
 	}
 
 	private boolean createWalls(int cx, int cz, byte[][] chunk)
