@@ -1,6 +1,9 @@
 package com.ftwinston.KillerMinecraft.Modules.Killbox;
 
 import org.bukkit.Material;
+import org.bukkit.event.EventException;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 
 import com.ftwinston.KillerMinecraft.Option;
 import com.ftwinston.KillerMinecraft.WorldConfig;
@@ -45,11 +48,20 @@ public class Killbox extends WorldGenerator
 		return new Option[] { boxSize };
 	}
 	
+	BoxGenerator generator;
+	
 	@Override
 	public void setupWorld(WorldConfig world, Runnable runWhenDone)
 	{
 		BoxSize size = boxSize.getValue();
-		world.setGenerator(new BoxGenerator(size.width, size.height, size.width));
+		generator = new BoxGenerator(size.width, size.height, size.width);
+		world.setGenerator(generator);
 		createWorld(world, runWhenDone);
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void onEvent(org.bukkit.event.world.WorldLoadEvent event) throws EventException
+	{
+		event.getWorld().setSpawnLocation(generator.middleX, generator.minY + 2, generator.middleZ);
 	}
 }

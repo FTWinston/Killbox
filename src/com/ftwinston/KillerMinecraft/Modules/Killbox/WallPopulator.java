@@ -3,21 +3,26 @@ package com.ftwinston.KillerMinecraft.Modules.Killbox;
 import java.util.Random;
 
 import org.bukkit.Chunk;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.generator.BlockPopulator;
 
 public class WallPopulator extends BlockPopulator
 {
-	public WallPopulator(int minX, int maxX, int minZ, int maxZ)
+	int minChunkX, maxChunkX, minChunkZ, maxChunkZ;
+	public WallPopulator(int minChunkX, int maxChunkX, int minChunkZ, int maxChunkZ)
 	{
-		// TODO Auto-generated constructor stub
+		this.minChunkX = minChunkX;
+		this.minChunkZ = minChunkZ;
+		this.maxChunkX = maxChunkX;
+		this.maxChunkZ = maxChunkZ;
 	}
 
 	@Override
 	public void populate(World w, Random r, Chunk c)
 	{
+		if (c.getX() < minChunkX || c.getX() > maxChunkX || c.getZ() < minChunkZ || c.getZ() > maxChunkZ)
+			return;
+		
 		/*
 		// lava
 		int num = 4, bx, by, bz;
