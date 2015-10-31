@@ -45,10 +45,10 @@ public class FloorPopulator extends BlockPopulator
 			else
 				populateForest(w,r,c);
 		
-		addPatchToStone(r, c, Material.COAL_ORE, (byte)0, r.nextInt(4) + 2);
-		addPatchToStone(r, c, Material.STONE, (byte)1, r.nextInt(16));
-		addPatchToStone(r, c, Material.STONE, (byte)3, r.nextInt(16));
-		addPatchToStone(r, c, Material.STONE, (byte)5, r.nextInt(16));
+		addPatch(r, c, stoneY, Material.COAL_ORE, (byte)0, Material.STONE, r.nextInt(4) + 2);
+		addPatch(r, c, stoneY, Material.STONE, (byte)1, Material.STONE, r.nextInt(16));
+		addPatch(r, c, stoneY, Material.STONE, (byte)3, Material.STONE, r.nextInt(16));
+		addPatch(r, c, stoneY, Material.STONE, (byte)5, Material.STONE, r.nextInt(16));
 	}
 
 	@SuppressWarnings("deprecation")
@@ -58,6 +58,9 @@ public class FloorPopulator extends BlockPopulator
 		for (int i=0; i<numGrass; i++)
 		{
 			Block b = c.getBlock(r.nextInt(16), treeY, r.nextInt(16));
+			if (b.getType() != Material.AIR)
+				continue;
+			
 			switch (r.nextInt(4))
 			{
 			case 0:
@@ -72,10 +75,9 @@ public class FloorPopulator extends BlockPopulator
 		// create a SMALL village
 		if (c.getX() == midChunkX - 1 && c.getZ() == midChunkZ - 1)
 		{
-			Block max = c.getBlock(0, 0, 0);
-			int minX = Math.max(4, max.getX() - 48);
-			int minZ = Math.max(4, max.getZ() - 48);
-			Helper.generateVillage(w, minX, max.getX(), minZ, max.getZ());  
+			int villageX = ((minChunkX << 4) + (midChunkX << 4)) / 2;
+			int villageZ = ((minChunkZ << 4) + (midChunkZ << 4)) / 2;
+			Helper.generateVillage(c.getBlock(villageX, grassY, villageZ).getLocation(), r, Math.min(Math.min(villageX / 2,  villageZ / 2) + 7, 32));  
 		}
 	}
 
@@ -83,52 +85,8 @@ public class FloorPopulator extends BlockPopulator
 	{
 		w.generateTree(c.getBlock(r.nextInt(16), treeY, r.nextInt(16)).getLocation(), TreeType.SWAMP);
 		
-		Block b = c.getBlock(2 + r.nextInt(12), grassY, 2 + r.nextInt(12));
-		b.setType(Material.STATIONARY_WATER);
-		surroundWithSand(b);
-		
-		int steps = r.nextInt(20) + 3;
-		for (int i=0; i<steps; i++)
-		{
-			switch (r.nextInt(4))
-			{
-			case 0:
-				b = b.getRelative(BlockFace.NORTH); break;
-			case 1:
-				b = b.getRelative(BlockFace.SOUTH); break;
-			case 2:
-				b = b.getRelative(BlockFace.EAST); break;
-			case 3:
-				b = b.getRelative(BlockFace.WEST); break;
-			}
-			
-			if (b.getType() == Material.GRASS)
-			{
-				b.setType(Material.STATIONARY_WATER);
-				surroundWithSand(b);
-			}
-		}
-	}
-
-	private void surroundWithSand(Block b)
-	{
-		b.getRelative(BlockFace.DOWN).setType(Material.SAND);
-		
-		Block other = b.getRelative(BlockFace.NORTH);
-		if (other.getType() == Material.GRASS)
-			other.setType(Material.SAND);
-		
-		other = b.getRelative(BlockFace.SOUTH);
-		if (other.getType() == Material.GRASS)
-			other.setType(Material.SAND);
-		
-		other = b.getRelative(BlockFace.EAST);
-		if (other.getType() == Material.GRASS)
-			other.setType(Material.SAND);
-		
-		other = b.getRelative(BlockFace.WEST);
-		if (other.getType() == Material.GRASS)
-			other.setType(Material.SAND);
+		addPatch(r, c, grassY, Material.STATIONARY_WATER, (byte)0, Material.GRASS, 2 + r.nextInt(12));
+		addPatch(r, c, stoneY, Material.CLAY, (byte)0, Material.STONE, 8 + r.nextInt(12));
 	}
 
 	private void populateDesert(World w, Random r, Chunk c)
@@ -138,23 +96,31 @@ public class FloorPopulator extends BlockPopulator
 		
 		if (r.nextInt(4) == 0)
 			w.generateTree(c.getBlock(r.nextInt(16), treeY, r.nextInt(16)).getLocation(), TreeType.ACACIA);
+		
+		addPatch(r, c, grassY, Material.SAND, (byte)0, Material.GRASS, 12 + r.nextInt(12));
 	}
 
 	private void populateForest(World w, Random r, Chunk c)
 	{
 		int numTrees = r.nextInt(3) + 3;
 		
-		c.getBlock(r.nextInt(16), treeY, r.nextInt(16)).setType(Material.BROWN_MUSHROOM);
-		c.getBlock(r.nextInt(16), treeY, r.nextInt(16)).setType(Material.RED_MUSHROOM);
-		
 		for (int i=0; i<numTrees; i++)
 			w.generateTree(c.getBlock(r.nextInt(16), treeY, r.nextInt(16)).getLocation(), TreeType.TREE);
+		
+		Block b = c.getBlock(r.nextInt(16), treeY, r.nextInt(16)); 
+		if (b.getType() == Material.AIR)
+			b.setType(Material.BROWN_MUSHROOM);
+		
+		b = c.getBlock(r.nextInt(16), treeY, r.nextInt(16)); 
+		if (b.getType() == Material.AIR)
+			b.setType(Material.RED_MUSHROOM);
+		
 	}
 
 	@SuppressWarnings("deprecation")
-	private void addPatchToStone(Random r, Chunk c, Material type, byte dataValue, int num)
+	private void addPatch(Random r, Chunk c, int y, Material type, byte dataValue, Material typeToReplace, int num)
 	{
-		Block b = c.getBlock(r.nextInt(16), stoneY, r.nextInt(16));
+		Block b = c.getBlock(r.nextInt(16), y, r.nextInt(16));
 		b.setType(type);
 		b.setData(dataValue);
 		
@@ -172,7 +138,7 @@ public class FloorPopulator extends BlockPopulator
 				b = b.getRelative(BlockFace.WEST); break;
 			}
 			
-			if (b.getType() == Material.STONE)
+			if (b.getType() == typeToReplace)
 			{
 				b.setType(type);
 				b.setData(dataValue);

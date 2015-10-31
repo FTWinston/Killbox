@@ -79,7 +79,7 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 		
 		createFloor(cx, cz, chunk);
 
-		createCeiling(cx, cz, chunk);
+		//createCeiling(cx, cz, chunk);
 		
 		return chunk; 
 	}
