@@ -15,11 +15,11 @@ public class Killbox extends WorldGenerator
 {
 	enum BoxSize
 	{
-		Tiny(64, 64, Material.STONE_PLATE),
-		Small(96, 96, Material.STONE_SLAB2),
-		Medium(128, 128, Material.BRICK_STAIRS),
-		Large(160, 160, Material.BRICK),
-		Huge(192, 192, Material.QUARTZ_BLOCK);
+		Tiny(64, 64, Material.STICK),
+		Small(96, 96, Material.WOOD_PICKAXE),
+		Medium(128, 128, Material.STONE_PICKAXE),
+		Large(160, 160, Material.IRON_PICKAXE),
+		Huge(192, 192, Material.DIAMOND_PICKAXE);
 		
 		int width, height;
 		Material material;
@@ -32,7 +32,7 @@ public class Killbox extends WorldGenerator
 		
 		public String getDescription()
 		{
-			return "World is " + width + " blocks long and " + height + " blocks high";
+			return width + " blocks long, " + height + " blocks high";
 		}
 	}
 	
@@ -60,10 +60,10 @@ public class Killbox extends WorldGenerator
 		world.setGenerator(generator);
 		createWorld(world, runWhenDone);
 	}
-	
+
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onEvent(org.bukkit.event.world.WorldInitEvent event) throws EventException
 	{
-		event.getWorld().setSpawnLocation(generator.middleX, generator.minY + 2, generator.middleZ);
+		event.getWorld().setSpawnLocation(generator.middleX, generator.minY + 8, generator.middleZ);
 	}
 }

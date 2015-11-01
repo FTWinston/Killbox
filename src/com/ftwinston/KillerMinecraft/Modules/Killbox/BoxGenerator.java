@@ -7,6 +7,7 @@ import java.util.Random;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
+import org.bukkit.block.BlockFace;
 import org.bukkit.generator.BlockPopulator;
 
 public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
@@ -23,8 +24,6 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 	final byte stone = (byte)Material.STONE.getId();
 	@SuppressWarnings("deprecation")
 	final byte bedrock = (byte)Material.BEDROCK.getId();
-	@SuppressWarnings("deprecation")
-	final byte invisible = (byte)Material.BARRIER.getId();
 	@SuppressWarnings("deprecation")
 	final byte lava = (byte)Material.STATIONARY_LAVA.getId();
 	@SuppressWarnings("deprecation")
@@ -73,35 +72,13 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 		boolean isBorderChunk = createWalls(cx, cz, chunk);
 		
 		if (isBorderChunk)
-		{// no floor/ceiling should go in this chunk
+		{// no floor should go in this chunk
 			return chunk;
 		}
 		
 		createFloor(cx, cz, chunk);
-
-		//createCeiling(cx, cz, chunk);
 		
 		return chunk; 
-	}
-
-	private void createCeiling(int cx, int cz, byte[][] chunk)
-	{
-		// fill in ceiling, with an invisible-barrier hole in the middle, to let light in
-		for (int x=0; x<16; x++)
-			for (int z=0; z<16; z++)
-			{
-				/*
-				if (edge)
-				{
-					setMaterialAt(chunk, x, maxY - 1, z, stone);
-					setMaterialAt(chunk, x, maxY, z, stone);				
-					setMaterialAt(chunk, x, maxY + 1, z, bedrock);
-				}
-				*/
-				setMaterialAt(chunk, x, maxY + 1, z, invisible);
-				
-				setMaterialAt(chunk, x, maxY + 2, z, invisible);
-			}
 	}
 
 	private void createFloor(int cx, int cz, byte[][] chunk)
@@ -173,7 +150,8 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 		
 		if (cx == minBorderCX)
 		{
-			int x = 15, minZ, maxZ; // bedrock at x=15
+			int solidX = 14, minZ, maxZ; // bedrock at x=15
+			int mixedX = 15;
 			
 			if (cz == minBorderCZ)
 			{
@@ -190,11 +168,15 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 			
 			for (int y=0; y<=maxY + 1; y++)
 				for (int z=minZ; z<=maxZ; z++)
-					setMaterialAt(chunk, x, y, z, bedrock);
+				{
+					setMaterialAt(chunk, solidX, y, z, bedrock);
+					setMaterialAt(chunk, mixedX, y, z, y > maxY || (y + z) % 2 == 0 ? bedrock : stone);
+				}
 		}
 		else if (cx == maxBorderCX)
 		{
-			int x = 0, minZ, maxZ; // bedrock at x=0
+			int solidX = 1, minZ, maxZ; // bedrock at x=0
+			int mixedX = 0;
 			
 			if (cz == minBorderCZ)
 			{
@@ -211,21 +193,32 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 			
 			for (int y=0; y<=maxY + 1; y++)
 				for (int z=minZ; z<=maxZ; z++)
-					setMaterialAt(chunk, x, y, z, bedrock);
+				{
+					setMaterialAt(chunk, solidX, y, z, bedrock);
+					setMaterialAt(chunk, mixedX, y, z, y > maxY || (y + z) % 2 == 0 ? bedrock : stone);
+				}
 		}
 		else if (cz == minBorderCZ)
 		{
-			int z = 15; // bedrock at z=15
+			int solidZ = 14; // bedrock at z=15
+			int mixedZ = 15;
 			for (int x=0; x<16; x++)
 				for (int y=0; y<=maxY + 1; y++)
-					setMaterialAt(chunk, x, y, z, bedrock);
+				{
+					setMaterialAt(chunk, x, y, solidZ, bedrock);
+					setMaterialAt(chunk, x, y, mixedZ, y > maxY || (y + x) % 2 == 0 ? bedrock : stone);
+				}
 		}
 		else if (cz == maxBorderCZ)
 		{
-			int z = 0; // bedrock at z=0
+			int solidZ = 1; // bedrock at z=0
+			int mixedZ = 0;
 			for (int x=0; x<16; x++)
 				for (int y=0; y<=maxY + 1; y++)
-					setMaterialAt(chunk, x, y, z, bedrock);
+				{
+					setMaterialAt(chunk, x, y, solidZ, bedrock);
+					setMaterialAt(chunk, x, y, mixedZ, y > maxY || (y + x) % 2 == 0 ? bedrock : stone);
+				}
 		}
 		else
 			border = false;
@@ -330,10 +323,13 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 	@Override
 	public List<BlockPopulator> getDefaultPopulators(World world)
 	{
-		List<BlockPopulator> list = new ArrayList<BlockPopulator>();
-		list.add(new WallPopulator(0, maxBorderCX - 1, 0, maxBorderCZ - 1));
+		List<BlockPopulator> list = new ArrayList<BlockPopulator>();		
 		list.add(new FloorPopulator(minY, minY + 1, 0, maxBorderCX - 1, 0, maxBorderCZ - 1, middleChunkX2, middleChunkZ2));
-		list.add(new CeilingPopulator(maxY, 0, maxBorderCX - 1, 0, maxBorderCZ - 1));
+
+		list.add(new WallPopulator(true, minY + 16, maxY, minBorderCX + 1, 0, BlockFace.WEST, minBorderCZ + 1, maxBorderCZ - 1));
+		list.add(new WallPopulator(true, minY + 16, maxY, maxBorderCX - 1, 15, BlockFace.EAST, minBorderCZ + 1, maxBorderCZ - 1));
+		list.add(new WallPopulator(false, minY + 16, maxY, minBorderCZ + 1, 0, BlockFace.NORTH, minBorderCX + 1, maxBorderCX - 1));
+		list.add(new WallPopulator(false, minY + 16, maxY, maxBorderCZ - 1, 15, BlockFace.SOUTH, minBorderCX + 1, maxBorderCX - 1));
 		return list;
 	}
 }

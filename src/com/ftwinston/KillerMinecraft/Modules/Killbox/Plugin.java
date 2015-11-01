@@ -12,7 +12,7 @@ public class Plugin extends WorldGeneratorPlugin
 	public Environment getWorldType() { return Environment.NORMAL; }
 	
 	@Override
-	public String[] getDescriptionText() { return new String[] {"Play in a confined space, with nowhere to hide"}; }
+	public String[] getDescriptionText() { return new String[] { "Play in a confined space,", "with nowhere to hide" }; }
 	
 	@Override
 	public Material getMenuIcon() { return Material.CHEST; }

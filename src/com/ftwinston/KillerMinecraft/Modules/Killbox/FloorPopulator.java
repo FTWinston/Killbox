@@ -50,7 +50,7 @@ public class FloorPopulator extends BlockPopulator
 		addPatch(r, c, stoneY, Material.STONE, (byte)3, Material.STONE, r.nextInt(16));
 		addPatch(r, c, stoneY, Material.STONE, (byte)5, Material.STONE, r.nextInt(16));
 	}
-
+	
 	@SuppressWarnings("deprecation")
 	private void populatePlains(World w, Random r, Chunk c)
 	{
@@ -77,7 +77,8 @@ public class FloorPopulator extends BlockPopulator
 		{
 			int villageX = ((minChunkX << 4) + (midChunkX << 4)) / 2;
 			int villageZ = ((minChunkZ << 4) + (midChunkZ << 4)) / 2;
-			Helper.generateVillage(c.getBlock(villageX, grassY, villageZ).getLocation(), r, Math.min(Math.min(villageX / 2,  villageZ / 2) + 7, 32));  
+			int radius = Math.min(Math.min(villageX / 2,  villageZ / 2) + 7, 32);
+			Helper.generateVillage(c.getBlock(villageX, grassY, villageZ).getLocation(), r, radius);
 		}
 	}
 
@@ -92,7 +93,11 @@ public class FloorPopulator extends BlockPopulator
 	private void populateDesert(World w, Random r, Chunk c)
 	{
 		if (r.nextInt(4) == 0)
-			c.getBlock(r.nextInt(16), treeY, r.nextInt(16)).setType(Material.LONG_GRASS);
+		{
+			Block b = c.getBlock(r.nextInt(16), treeY, r.nextInt(16)); 
+			if (b.getType() == Material.AIR)
+				b.setType(Material.LONG_GRASS);
+		}
 		
 		if (r.nextInt(4) == 0)
 			w.generateTree(c.getBlock(r.nextInt(16), treeY, r.nextInt(16)).getLocation(), TreeType.ACACIA);
