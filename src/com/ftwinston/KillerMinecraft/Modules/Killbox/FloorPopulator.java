@@ -75,9 +75,7 @@ public class FloorPopulator extends BlockPopulator
 		// create a SMALL village
 		if (c.getX() == midChunkX - 1 && c.getZ() == midChunkZ - 1)
 		{
-			int villageX = ((minChunkX << 4) + (midChunkX << 4)) / 2;
-			int villageZ = ((minChunkZ << 4) + (midChunkZ << 4)) / 2;
-			int radius = Math.min(Math.min(villageX / 2,  villageZ / 2) + 7, 32);
+			int villageX = 16, villageZ = 16, radius = 15;
 			Helper.generateVillage(c.getBlock(villageX, grassY, villageZ).getLocation(), r, radius);
 		}
 	}
