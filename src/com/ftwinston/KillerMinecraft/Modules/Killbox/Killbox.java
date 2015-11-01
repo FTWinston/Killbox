@@ -41,7 +41,7 @@ public class Killbox extends WorldGenerator
 	@Override
 	public Option[] setupOptions()
 	{
-		boxSize = new ChoiceOption<BoxSize>("World Size");
+		boxSize = new ChoiceOption<BoxSize>("World Size", BoxSize.Small);
 		
 		for (BoxSize size : BoxSize.values())
 			boxSize.addChoice(size.name(), size, size.material, size.getDescription());
@@ -64,6 +64,6 @@ public class Killbox extends WorldGenerator
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onEvent(org.bukkit.event.world.WorldInitEvent event) throws EventException
 	{
-		event.getWorld().setSpawnLocation(generator.middleX, generator.minY + 8, generator.middleZ);
+		event.getWorld().setSpawnLocation(generator.middleX, generator.minY + 4, generator.middleZ);
 	}
 }

@@ -55,8 +55,8 @@ public class WallPopulator extends BlockPopulator
 		
 		for (int y = minY + 16; y < maxY - yStep; y += yStep)
 		{
-			addPatch(r, c, y, y + yStep, Material.IRON_ORE, (byte)0, Material.STONE, r.nextInt(3) + 2);
-			addPatch(r, c, y, y + yStep, Material.IRON_ORE, (byte)0, Material.STONE, r.nextInt(3) + 2);
+			addPatch(r, c, y, y + yStep, Material.IRON_ORE, (byte)0, Material.STONE, r.nextInt(4) + 2);
+			addPatch(r, c, y, y + yStep, Material.IRON_ORE, (byte)0, Material.STONE, r.nextInt(4) + 2);
 			addPatch(r, c, y, y + yStep, Material.REDSTONE_ORE, (byte)0, Material.STONE, r.nextInt(6) + 2);
 			
 			addHiddenBlock(r, c, y, y + yStep, Material.STATIONARY_WATER, (byte)0, Material.STONE);

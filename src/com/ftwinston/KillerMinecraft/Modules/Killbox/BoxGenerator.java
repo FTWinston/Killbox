@@ -200,9 +200,23 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 		}
 		else if (cz == minBorderCZ)
 		{
-			int solidZ = 14; // bedrock at z=15
+			int solidZ = 14, minX, maxX; // bedrock at z=15
 			int mixedZ = 15;
-			for (int x=0; x<16; x++)
+			
+			if (cz == minBorderCZ)
+			{
+				minX = maxX = 15;
+			}
+			else if (cz == maxBorderCZ)
+			{
+				minX = maxX = 0;
+			}
+			else
+			{
+				minX = 0; maxX = 15;	
+			}
+			
+			for (int x=minX; x<=maxX; x++)
 				for (int y=0; y<=maxY + 1; y++)
 				{
 					setMaterialAt(chunk, x, y, solidZ, bedrock);
@@ -211,9 +225,23 @@ public class BoxGenerator extends org.bukkit.generator.ChunkGenerator
 		}
 		else if (cz == maxBorderCZ)
 		{
-			int solidZ = 1; // bedrock at z=0
-			int mixedZ = 0;
-			for (int x=0; x<16; x++)
+			int solidZ = 1, minX, maxX; // bedrock at z=0
+			int mixedZ = 0;			
+			
+			if (cz == minBorderCZ)
+			{
+				minX = maxX = 15;
+			}
+			else if (cz == maxBorderCZ)
+			{
+				minX = maxX = 0;
+			}
+			else
+			{
+				minX = 0; maxX = 15;	
+			}
+			
+			for (int x=minX; x<=maxX; x++)
 				for (int y=0; y<=maxY + 1; y++)
 				{
 					setMaterialAt(chunk, x, y, solidZ, bedrock);
